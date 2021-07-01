@@ -1,0 +1,6 @@
+sample_data/*
+venv
+build
+data/configs.pkl
+productionreport/__pycache__
+.idea
