@@ -5,7 +5,7 @@ block_cipher = None
 
 
 a = Analysis(['productionreport/app.py'],
-             pathex=['/home/prashant/PycharmProjects/production-report/productionreport'],
+             pathex=['productionreport'],
              binaries=[],
              datas=[('data/*', 'data')],
              hiddenimports=[],
