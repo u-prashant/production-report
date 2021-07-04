@@ -20,7 +20,7 @@ def get_department(value):
         dept = 'TMC'
     elif 'TINT' in value:
         dept = 'TINT'
-    elif 'FINAL' in value:
+    elif 'QC' in value and 'COATING' in value:
         dept = 'FINAL QC'
     elif 'FITT' in value:
         dept = 'FITT'

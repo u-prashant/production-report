@@ -47,7 +47,7 @@ class Manager:
 
 
 if __name__ == '__main__':
-    production_files_path = [r'../sample_data/Ex_Dom_Files/Dom_0506.csv', r'../sample_data/Ex_Dom_Files/Ex_0506.csv']
+    production_files_path = [r'../sample_data/Ex_Dom_Files/Dom_0506.csv']
     loss_files_path = [r'../sample_data/export_domestic_loss_27th_June.xlsx']
     production_columns_file_path = r'../data/production_columns.csv'
     summary_file_dir_path = r'../sample_data'

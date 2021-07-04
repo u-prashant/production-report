@@ -1,5 +1,7 @@
 import datetime
 
+import pandas as pd
+
 from helper import get_lab, get_department
 
 
@@ -19,16 +21,28 @@ class LossPreprocessor:
 
 class Preprocess:
     def preprocess(self, df):
+        df = self.set_datatype(df)
+        df = self.sort(df)
         df = self.add_production_date(df)
         df = self.add_department(df)
         df = self.add_building(df)
-        df = self.sort(df)
         df = self.group_by_oci(df)
         return df
 
     def add_production_date(self, df):
-        df['ProductionDate'] = \
-            df.apply(lambda x: self.get_date_based_on_6am_format(x['DateOfChange'], x['ChangeOfTime']), axis=1)
+        columns_to_shift = ['DateOfChange', 'ChangeOfTime']
+        shifted_columns = ['DateOfChange X', 'ChangeOfTime X']
+        df[shifted_columns] = df[columns_to_shift].shift(-1)
+        df['ProductionDate'] = df.apply(
+            lambda x: self.get_date_based_on_6am_format(x['DateOfChange X'], x['ChangeOfTime X']), axis=1)
+        df = df.drop(columns=shifted_columns)
+        return df
+
+    @staticmethod
+    def set_datatype(df):
+        df['DateOfChange'] = pd.to_datetime(df['DateOfChange'], dayfirst=True).dt.date
+        # df['ProductionDate'] = pd.to_datetime(df['ProductionDate'], dayfirst=True).dt.date
+        df['ChangeOfTime'] = pd.to_datetime(df['ChangeOfTime'], format='%H:%M:%S').dt.time
         return df
 
     @staticmethod
@@ -51,12 +65,10 @@ class Preprocess:
 
     @staticmethod
     def get_date_based_on_6am_format(date, time):
-        try:
-            original_date = datetime.datetime.strptime(date, '%d/%m/%Y')
-        except ValueError:
-            original_date = datetime.datetime.strptime(date, '%d-%m-%Y')
-        original_time = datetime.datetime.strptime(time, '%H:%M:%S')
-        new_date = original_date
-        if original_time.hour < 6:
-            new_date = original_date - datetime.timedelta(days=1)
-        return new_date.strftime('%d/%m/%Y')
+        if pd.isnull(date) or pd.isnull(time):
+            return pd.NaT
+
+        new_date = date
+        if time.hour < 6:
+            new_date = new_date - datetime.timedelta(days=1)
+        return new_date
