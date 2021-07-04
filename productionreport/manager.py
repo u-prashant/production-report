@@ -21,7 +21,7 @@ class Manager:
 
     @staticmethod
     def get_summary_file(summary_file_dir):
-        current_time = datetime.now().strftime('%d-%m-%Y_%H:%M:%S')
+        current_time = datetime.now().strftime('%d-%m-%Y_%H-%M-%S')
         return os.path.join(summary_file_dir, 'production_summary_{}.xlsx'.format(current_time))
 
     def manage(self):
