@@ -52,7 +52,7 @@ class DSTSReporter(Reporter):
 
     def generate_summary(self, df):
         oci = df.groupby(['OCINumber']).filter(
-            lambda x: x['ProductionQuantity'].sum() == 0 and ('DS' in x['Department'] or 'TS' in x['Department']))[
+            lambda x: (x['ProductionQuantity'].sum() == 0) & (x['Department'].str.contains('TS|DS').any()))[
             'OCINumber'].unique()
         zero_prod_df = pd.DataFrame(oci, columns=['OCINumber'])
         print('writing zero production OCIs to file...')

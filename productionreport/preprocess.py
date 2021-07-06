@@ -34,14 +34,13 @@ class Preprocess:
         shifted_columns = ['DateOfChange X', 'ChangeOfTime X']
         df[shifted_columns] = df[columns_to_shift].shift(-1)
         df['ProductionDate'] = df.apply(
-            lambda x: self.get_date_based_on_6am_format(x['DateOfChange X'], x['ChangeOfTime X']), axis=1)
+            lambda x: self.get_date_based_on_7am_format(x['DateOfChange X'], x['ChangeOfTime X']), axis=1)
         df = df.drop(columns=shifted_columns)
         return df
 
     @staticmethod
     def set_datatype(df):
         df['DateOfChange'] = pd.to_datetime(df['DateOfChange'], dayfirst=True).dt.date
-        # df['ProductionDate'] = pd.to_datetime(df['ProductionDate'], dayfirst=True).dt.date
         df['ChangeOfTime'] = pd.to_datetime(df['ChangeOfTime'], format='%H:%M:%S').dt.time
         return df
 
@@ -64,11 +63,11 @@ class Preprocess:
         return df.groupby(['OCINumber'])
 
     @staticmethod
-    def get_date_based_on_6am_format(date, time):
+    def get_date_based_on_7am_format(date, time):
         if pd.isnull(date) or pd.isnull(time):
             return pd.NaT
 
         new_date = date
-        if time.hour < 6:
+        if time.hour < 7:
             new_date = new_date - datetime.timedelta(days=1)
         return new_date
