@@ -278,12 +278,13 @@ class StateManager:
     def get_order_quantity(df):
         return int(df.iloc[0]['OCIQty'])
 
-    def update_quantity(self, rows, quantity):
+    def update_quantity(self, rows, quantity, date):
         if quantity == 0:
             return
         for index in range(len(rows) - 1, 0, -1):
             if rows[index]['OrderStatus'] in self.source_states:
                 rows[index]['ProductionQuantity'] = quantity
+                rows[index]['ProductionDate'] = date
                 return
 
     def get_production(self, oci, df):
@@ -293,7 +294,10 @@ class StateManager:
                                      self.loss_finder, oci, order_quantity)
         for _, row in df.iterrows():
             quantity = state_machine.next(row['OrderStatus'])
+            date = row['ProductionDate']
+            if len(rows) > 0:
+                date = rows[-1]['ProductionDate']
             row['ProductionQuantity'] = 0
-            self.update_quantity(rows, quantity)
+            self.update_quantity(rows, quantity, date)
             rows.append(row)
         return rows
