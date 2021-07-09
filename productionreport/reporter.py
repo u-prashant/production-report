@@ -33,13 +33,15 @@ class DSTSReporter(Reporter):
         self.state_manager = StateManager(states_file, loss_states_df, loss_df)
         self.oci_sheet_name = 'DS_TS_OCI'
         self.zero_production_oci_sheet_name = '0 Production OCIs'
+        self.zero_production_without_invoice_sheet_name = 'Without invoice OCIs'
 
     def name(self):
         return 'DS TS Reporter'
 
     def generate_report(self):
         df = self.filter_production_rows()
-        self.generate_summary(df)
+        self.generate_zero_production_oci(df)
+        self.generate_zero_production_without_invoice_oci(df)
 
     def filter_production_rows(self):
         rows = []
@@ -50,7 +52,16 @@ class DSTSReporter(Reporter):
         df.to_excel(self.writer, sheet_name=self.oci_sheet_name, index=False)
         return df
 
-    def generate_summary(self, df):
+    def generate_zero_production_without_invoice_oci(self, df):
+        without_invoice_oci = df.groupby(['OCINumber']).filter(
+            lambda x: not x['Department'].str.contains('INVOICED').any())[
+            'OCINumber'].unique()
+        without_invoice_oci_df = pd.DataFrame(without_invoice_oci, columns=['OCINumber'])
+        print('writing non-invoiced production OCIs to file...')
+        without_invoice_oci_df.to_excel(self.writer, sheet_name=self.zero_production_without_invoice_sheet_name,
+                                        index=False)
+
+    def generate_zero_production_oci(self, df):
         oci = df.groupby(['OCINumber']).filter(
             lambda x: (x['ProductionQuantity'].sum() == 0) & (x['Department'].str.contains('TS|DS').any()))[
             'OCINumber'].unique()
