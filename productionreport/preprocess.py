@@ -2,7 +2,7 @@ import datetime
 
 import pandas as pd
 
-from helper import get_lab, get_department
+from helper import get_lab
 
 
 class LossPreprocessor:
@@ -20,11 +20,11 @@ class LossPreprocessor:
 
 
 class Preprocess:
-    def preprocess(self, df):
+    def preprocess(self, df, department_finder):
         df = self.set_datatype(df)
         df = self.sort(df)
         df = self.add_production_date(df)
-        df = self.add_department(df)
+        df = self.add_department(df, department_finder)
         df = self.add_building(df)
         df = self.group_by_oci(df)
         return df
@@ -45,8 +45,8 @@ class Preprocess:
         return df
 
     @staticmethod
-    def add_department(df):
-        df['Department'] = df['OrderStatus'].apply(get_department)
+    def add_department(df, department_finder):
+        df['Department'] = df['OrderStatus'].apply(department_finder.get_department)
         return df
 
     @staticmethod

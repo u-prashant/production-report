@@ -68,3 +68,36 @@ class DSTSReporter(Reporter):
         zero_prod_df = pd.DataFrame(oci, columns=['OCINumber'])
         print('writing zero production OCIs to file...')
         zero_prod_df.to_excel(self.writer, sheet_name=self.zero_production_oci_sheet_name, index=False)
+
+
+class FittingReporter(Reporter):
+    def __init__(self, writer, production_df, loss_df, loss_states_df, states_file):
+        self.writer = writer
+        self.production_df = production_df
+        self.state_manager = StateManager(states_file, loss_states_df, loss_df)
+        self.oci_sheet_name = 'FITT_OCI'
+        self.zero_production_oci_sheet_name = '0 Production FITT OCIs'
+
+    def name(self):
+        return 'Fitting Reporter'
+
+    def generate_report(self):
+        df = self.filter_production_rows()
+        self.generate_zero_production_oci(df)
+
+    def filter_production_rows(self):
+        rows = []
+        for oci, group in self.production_df:
+            rows.extend(self.state_manager.get_production(oci, group))
+        df = pd.DataFrame(rows)
+        print('writing fitting production rows to file...')
+        df.to_excel(self.writer, sheet_name=self.oci_sheet_name, index=False)
+        return df
+
+    def generate_zero_production_oci(self, df):
+        oci = df.groupby(['OCINumber']).filter(
+            lambda x: (x['ProductionQuantity'].sum() == 0) & (x['Department'].str.contains('FITT').any()))[
+            'OCINumber'].unique()
+        zero_prod_df = pd.DataFrame(oci, columns=['OCINumber'])
+        print('writing zero production Fitting OCIs to file...')
+        zero_prod_df.to_excel(self.writer, sheet_name=self.zero_production_oci_sheet_name, index=False)

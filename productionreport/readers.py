@@ -41,3 +41,9 @@ class LossStateReader:
     @staticmethod
     def read(loss_state_file):
         return Reader.read_csv(loss_state_file)
+
+
+class DepartmentFileReader:
+    @staticmethod
+    def read(department_file):
+        return Reader.read_excel(department_file)

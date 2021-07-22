@@ -1,6 +1,6 @@
+import sys
 from enum import Enum
 
-from helper import get_department
 from readers import Reader
 
 
@@ -32,196 +32,198 @@ class StateMachine:
         self.current_state = State.INITIAL
         self.last_states = []
 
-        self.current_status = ''
-        self.last_status = []
+        self.current_department = ''
+        self.last_departments = []
 
-        self.last_status_before_loss = ['']
+        self.last_department_before_loss = ['NO DEPT']
 
-    def update_states(self, state, order_status):
+    def update_states(self, state, department):
         self.last_states.append(self.current_state)
         self.current_state = state
-        self.last_status.append(self.current_status)
-        self.current_status = order_status
+        self.last_departments.append(self.current_department)
+        self.current_department = department
 
-    def move_to_initial_state(self, order_status):
-        self.update_states(State.INITIAL, order_status)
+    def move_to_initial_state(self, department):
+        self.update_states(State.INITIAL, department)
         return 0
 
-    def move_to_source_state_1(self, order_status):
-        self.update_states(State.SOURCE_1, order_status)
+    def move_to_source_state_1(self, department):
+        self.update_states(State.SOURCE_1, department)
         return 0
 
-    def move_to_source_state_2(self, order_status):
-        self.update_states(State.SOURCE_2, order_status)
+    def move_to_source_state_2(self, department):
+        self.update_states(State.SOURCE_2, department)
         return 0
 
-    def move_to_target_state_1(self, order_status):
-        self.update_states(State.TARGET_1, order_status)
+    def move_to_target_state_1(self, department):
+        self.update_states(State.TARGET_1, department)
         quantity = 0
         if self.last_states[-1] in (State.SOURCE_1, State.OTHER_1):
             quantity = self.quantity[-1]
         return quantity
 
-    def move_to_target_state_2(self, order_status):
-        self.update_states(State.TARGET_2, order_status)
+    def move_to_target_state_2(self, department):
+        self.update_states(State.TARGET_2, department)
         return 0
 
-    def move_to_other_state_1(self, order_status):
-        self.update_states(State.OTHER_1, order_status)
+    def move_to_other_state_1(self, department):
+        self.update_states(State.OTHER_1, department)
         return 0
 
-    def move_to_other_state_2(self, order_status):
-        self.update_states(State.OTHER_2, order_status)
+    def move_to_other_state_2(self, department):
+        self.update_states(State.OTHER_2, department)
         return 0
 
-    def move_to_other_state_3(self, order_status):
-        self.update_states(State.OTHER_3, order_status)
+    def move_to_other_state_3(self, department):
+        self.update_states(State.OTHER_3, department)
         return 0
 
-    def move_to_loss_state(self, order_status):
+    def move_to_loss_state(self, department):
         if self.current_state == State.LOSS:
             return 0
-        self.last_status_before_loss.append(self.current_status)
-        self.update_states(State.LOSS, order_status)
-        department = get_department(self.last_status[-1])
-        quantity = self.loss_finder.get_quantity(self.oci_number, department)
+        self.last_department_before_loss.append(self.current_department)
+        self.update_states(State.LOSS, department)
+        quantity = self.loss_finder.get_quantity(self.oci_number, self.last_departments[-1])
         if quantity == 0:
             quantity = self.order_quantity
         self.quantity.append(quantity)
         return 0
 
-    def move_to_ignore_state(self, order_status):
+    def move_to_ignore_state(self, department):
         return 0
 
-    def handle_initial_state(self, order_status):
+    def handle_initial_state(self, order_status, department):
         if order_status in self.sources_states:
-            return self.move_to_source_state_1(order_status)
+            return self.move_to_source_state_1(department)
         elif self.ignore_states in order_status:
-            return self.move_to_ignore_state(order_status)
+            return self.move_to_ignore_state(department)
         else:
-            return self.move_to_initial_state(order_status)
+            return self.move_to_initial_state(department)
 
-    def handle_source_state_1(self, order_status):
+    def handle_source_state_1(self, order_status, department):
         if order_status in self.sources_states:
-            return self.move_to_source_state_1(order_status)
+            return self.move_to_source_state_1(department)
         elif order_status in self.target_states:
-            return self.move_to_target_state_1(order_status)
+            return self.move_to_target_state_1(department)
         elif order_status in self.loss_states:
-            return self.move_to_loss_state(order_status)
+            return self.move_to_loss_state(department)
         elif self.ignore_states in order_status:
-            return self.move_to_ignore_state(order_status)
+            return self.move_to_ignore_state(department)
         else:
-            return self.move_to_other_state_1(order_status)
+            return self.move_to_other_state_1(department)
 
-    def handle_source_state_2(self, order_status):
+    def handle_source_state_2(self, order_status, department):
         if order_status in self.sources_states:
-            return self.move_to_source_state_2(order_status)
+            return self.move_to_source_state_2(department)
         elif order_status in self.target_states:
-            return self.move_to_target_state_1(order_status)
+            return self.move_to_target_state_1(department)
         elif order_status in self.loss_states:
-            return self.move_to_loss_state(order_status)
+            return self.move_to_loss_state(department)
         elif self.ignore_states in order_status:
-            return self.move_to_ignore_state(order_status)
+            return self.move_to_ignore_state(department)
         else:
-            return self.move_to_other_state_2(order_status)
+            return self.move_to_other_state_2(department)
 
-    def handle_target_state_1(self, order_status):
+    def handle_target_state_1(self, order_status, department):
         if order_status in self.sources_states:
-            return self.move_to_source_state_2(order_status)
+            return self.move_to_source_state_2(department)
         elif order_status in self.target_states:
-            return self.move_to_target_state_1(order_status)
+            return self.move_to_target_state_1(department)
         elif order_status in self.loss_states:
-            return self.move_to_loss_state(order_status)
+            return self.move_to_loss_state(department)
         elif self.ignore_states in order_status:
-            return self.move_to_ignore_state(order_status)
+            return self.move_to_ignore_state(department)
         else:
-            return self.move_to_other_state_2(order_status)
+            return self.move_to_other_state_2(department)
 
-    def handle_target_state_2(self, order_status):
+    def handle_target_state_2(self, order_status, department):
         if order_status in self.sources_states:
-            return self.move_to_source_state_1(order_status)
+            return self.move_to_source_state_1(department)
         elif order_status in self.target_states:
-            return self.move_to_target_state_2(order_status)
+            return self.move_to_target_state_2(department)
         elif order_status in self.loss_states:
-            return self.move_to_loss_state(order_status)
+            return self.move_to_loss_state(department)
         elif self.ignore_states in order_status:
-            return self.move_to_ignore_state(order_status)
+            return self.move_to_ignore_state(department)
         else:
-            return self.move_to_other_state_3(order_status)
+            return self.move_to_other_state_3(department)
 
-    def handle_other_state_1(self, order_status):
+    def handle_other_state_1(self, order_status, department):
         if order_status in self.sources_states:
-            return self.move_to_source_state_1(order_status)
+            return self.move_to_source_state_1(department)
         elif order_status in self.target_states:
-            return self.move_to_target_state_1(order_status)
+            return self.move_to_target_state_1(department)
         elif order_status in self.loss_states:
-            return self.move_to_loss_state(order_status)
+            return self.move_to_loss_state(department)
         elif self.ignore_states in order_status:
-            return self.move_to_ignore_state(order_status)
+            return self.move_to_ignore_state(department)
         else:
-            return self.move_to_other_state_1(order_status)
+            return self.move_to_other_state_1(department)
 
-    def handle_other_state_2(self, order_status):
+    def handle_other_state_2(self, order_status, department):
         if order_status in self.sources_states:
-            return self.move_to_source_state_2(order_status)
+            return self.move_to_source_state_2(department)
         elif order_status in self.target_states:
-            return self.move_to_target_state_1(order_status)
+            return self.move_to_target_state_1(department)
         elif order_status in self.loss_states:
-            return self.move_to_loss_state(order_status)
+            return self.move_to_loss_state(department)
         elif self.ignore_states in order_status:
-            return self.move_to_ignore_state(order_status)
+            return self.move_to_ignore_state(department)
         else:
-            return self.move_to_other_state_2(order_status)
+            return self.move_to_other_state_2(department)
 
-    def handle_other_state_3(self, order_status):
+    def handle_other_state_3(self, order_status, department):
         if order_status in self.sources_states:
-            return self.move_to_source_state_1(order_status)
+            return self.move_to_source_state_1(department)
         elif order_status in self.target_states:
-            return self.move_to_target_state_2(order_status)
+            return self.move_to_target_state_2(department)
         elif order_status in self.loss_states:
-            return self.move_to_loss_state(order_status)
+            return self.move_to_loss_state(department)
         elif self.ignore_states in order_status:
-            return self.move_to_ignore_state(order_status)
+            return self.move_to_ignore_state(department)
         else:
-            return self.move_to_other_state_3(order_status)
+            return self.move_to_other_state_3(department)
 
-    def handle_loss_state(self, order_status):
+    def handle_loss_state(self, order_status, department):
         if order_status in self.sources_states:
-            return self.move_to_source_state_1(order_status)
+            return self.move_to_source_state_1(department)
         elif order_status in self.target_states:
-            return self.move_to_target_state_2(order_status)
+            return self.move_to_target_state_2(department)
         elif order_status in self.loss_states:
-            return self.move_to_loss_state(order_status)
+            return self.move_to_loss_state(department)
         elif self.ignore_states in order_status:
-            return self.move_to_ignore_state(order_status)
+            return self.move_to_ignore_state(department)
         else:
-            return self.move_to_other_state_3(order_status)
+            return self.move_to_other_state_3(department)
 
-    def check_if_loss_department_reached_again(self, order_status):
-        if self.last_status_before_loss[-1] == order_status:
-            self.quantity.pop()
-            self.last_status_before_loss.pop()
+    def check_if_loss_department_reached_again(self, department):
+        try:
+            if self.last_department_before_loss[-1] == department:
+                self.quantity.pop()
+                self.last_department_before_loss.pop()
+        except:
+            print('VERIFY', self.oci_number)
 
-    def next(self, order_status):
-        self.check_if_loss_department_reached_again(order_status)
+    def next(self, order_status, department):
         if self.current_state == State.INITIAL:
-            quantity = self.handle_initial_state(order_status)
+            quantity = self.handle_initial_state(order_status, department)
         elif self.current_state == State.SOURCE_1:
-            quantity = self.handle_source_state_1(order_status)
+            quantity = self.handle_source_state_1(order_status, department)
         elif self.current_state == State.SOURCE_2:
-            quantity = self.handle_source_state_2(order_status)
+            quantity = self.handle_source_state_2(order_status, department)
         elif self.current_state == State.TARGET_1:
-            quantity = self.handle_target_state_1(order_status)
+            quantity = self.handle_target_state_1(order_status, department)
         elif self.current_state == State.TARGET_2:
-            quantity = self.handle_target_state_2(order_status)
+            quantity = self.handle_target_state_2(order_status, department)
         elif self.current_state == State.OTHER_1:
-            quantity = self.handle_other_state_1(order_status)
+            quantity = self.handle_other_state_1(order_status, department)
         elif self.current_state == State.OTHER_2:
-            quantity = self.handle_other_state_2(order_status)
+            quantity = self.handle_other_state_2(order_status, department)
         elif self.current_state == State.OTHER_3:
-            quantity = self.handle_other_state_3(order_status)
+            quantity = self.handle_other_state_3(order_status, department)
         elif self.current_state == State.LOSS:
-            quantity = self.handle_loss_state(order_status)
+            quantity = self.handle_loss_state(order_status, department)
+        self.check_if_loss_department_reached_again(department)
         return quantity
 
 
@@ -242,7 +244,7 @@ class LossFinder:
         # final qc loss should be taken from tc or tmc
         departments = [department]
         if department == 'FINAL QC':
-            departments.extend(['TC', 'TMC', 'CS'])
+            departments.extend(['TC', 'TMC', 'CS', 'STORES'])
 
         df = self.loss_df[(self.loss_df['OCI'] == oci_number) & (self.loss_df['Department'].isin(departments))]
         if len(df) == 0:
@@ -293,7 +295,7 @@ class StateManager:
         state_machine = StateMachine(self.source_states, self.target_states, self.loss_states, self.ignore_states,
                                      self.loss_finder, oci, order_quantity)
         for _, row in df.iterrows():
-            quantity = state_machine.next(row['OrderStatus'])
+            quantity = state_machine.next(row['OrderStatus'], row['Department'])
             date = row['ProductionDate']
             if len(rows) > 0:
                 date = rows[-1]['ProductionDate']
