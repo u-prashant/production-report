@@ -36,7 +36,6 @@ class StateMachine:
         self.last_departments = []
 
         self.last_department_before_loss = ['NO DEPT']
-        self.loss_department_reached = False
 
     def update_states(self, state, department):
         self.last_states.append(self.current_state)
@@ -61,9 +60,6 @@ class StateMachine:
         quantity = 0
         if self.last_states[-1] in (State.SOURCE_1, State.OTHER_1):
             quantity = self.quantity[-1]
-        if self.loss_department_reached:
-            self.loss_department_reached = False
-            self.quantity.pop()
         return quantity
 
     def move_to_target_state_2(self, department):
@@ -201,9 +197,12 @@ class StateMachine:
             return self.move_to_other_state_3(department)
 
     def check_if_loss_department_reached_again(self, department):
-        if self.last_department_before_loss[-1] == department:
-            self.loss_department_reached = True
-            self.last_department_before_loss.pop()
+        try:
+            if self.last_department_before_loss[-1] == department:
+                self.quantity.pop()
+                self.last_department_before_loss.pop()
+        except:
+            print('VERIFY', self.oci_number)
 
     def next(self, order_status, department):
         if self.current_state == State.INITIAL:
