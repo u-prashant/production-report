@@ -5,6 +5,7 @@ from datetime import datetime
 import pandas as pd
 
 from department import DepartmentFinder
+from all_dept_reporter import OneTimeProductionReporter
 from preprocess import Preprocess, LossPreprocessor
 from readers import ProductionFileReader, LossFileReader, LossStateReader, DepartmentFileReader
 from reporter import ReportManager, DSTSReporter, FittingReporter
@@ -46,6 +47,9 @@ class Manager:
         fitting_reporter = FittingReporter(writer, production_df, loss_df, loss_states_df, self.fitting_state_file)
         reporters = ReportManager([ds_ts_reporter, fitting_reporter])
         reporters.generate_report()
+
+        one_time_prod_reporter = OneTimeProductionReporter(writer)
+        one_time_prod_reporter.generate_report(production_df)
 
         writer.save()
 
