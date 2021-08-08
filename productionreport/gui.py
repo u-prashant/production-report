@@ -22,7 +22,9 @@ class GUI:
         prod = ComponentGUI(window, self.config.production_dir, 'Production')
         loss = ComponentGUI(window, self.config.loss_dir, 'Loss')
         target = TargetGUI(window, self.config.target_dir)
-        generate = GenerateReportGUI(window, prod, loss, target, self.config)
+        prod_checkbox = CheckboxGUI(window, 'Production')
+        order_receipt_checkbox = CheckboxGUI(window, 'Order Receipt')
+        generate = GenerateReportGUI(window, prod, loss, target, self.config, prod_checkbox, order_receipt_checkbox)
         exit_btn = ExitGUI(window)
 
         prod.label_static.grid(column=1, row=1, padx=15, pady=20, sticky='W')
@@ -43,8 +45,13 @@ class GUI:
 
         ttk.Separator(window, orient='horizontal').grid(column=1, row=9, columnspan=4, sticky='ew')
 
-        generate.button.grid(column=2, row=10, columnspan=2, padx=15, pady=20, sticky='EW')
-        exit_btn.button.grid(column=2, row=11, columnspan=2, padx=15, pady=20, sticky='EW')
+        prod_checkbox.checkbox.grid(column=2, row=10, columnspan=2, padx=15, pady=20, sticky='EW')
+        order_receipt_checkbox.checkbox.grid(column=2, row=11, columnspan=2, padx=15, pady=20, sticky='EW')
+
+        ttk.Separator(window, orient='horizontal').grid(column=1, row=12, columnspan=4, sticky='ew')
+
+        generate.button.grid(column=2, row=13, columnspan=2, padx=15, pady=20, sticky='EW')
+        exit_btn.button.grid(column=2, row=14, columnspan=2, padx=15, pady=20, sticky='EW')
 
         window.mainloop()
 
@@ -114,13 +121,25 @@ class ComponentGUI:
         self.label_dynamic.configure(text=text)
 
 
+class CheckboxGUI:
+    def __init__(self, window, text):
+        self.window = window
+        self.var = IntVar()
+        self.checkbox = self.get_checkbox(text)
+
+    def get_checkbox(self, text):
+        return Checkbutton(self.window, text=text, variable=self.var, bg='azure3')
+
+
 class GenerateReportGUI:
-    def __init__(self, window, prod_ui, loss_ui, target_ui, config):
+    def __init__(self, window, prod_ui, loss_ui, target_ui, config, prod_checkbox, order_receipt_checkbox):
         self.config = config
         self.window = window
         self.prod_ui = prod_ui
         self.loss_ui = loss_ui
         self.target_ui = target_ui
+        self.prod_checkbox = prod_checkbox
+        self.order_receipt_checkbox = order_receipt_checkbox
         self.button = self.get_button()
 
     def get_button(self):
@@ -131,6 +150,8 @@ class GenerateReportGUI:
         prod_files = self.prod_ui.label_dynamic.cget('text')
         loss_files = self.loss_ui.label_dynamic.cget('text')
         target_dir = self.target_ui.label_dynamic.cget('text')
+        production_report = self.prod_checkbox.var.get() == 1
+        order_receipt_report = self.order_receipt_checkbox.var.get() == 1
 
         self.config.set_production_dir(prod_files)
         self.config.set_loss_dir(loss_files)
@@ -147,7 +168,8 @@ class GenerateReportGUI:
         fitting_state_file_path = r'data/fitting_states.csv'
 
         manager = Manager(prod_files_path, loss_files_path, production_columns_file_path, target_dir,
-                          loss_state_file_path, ds_ts_state_file_path, department_file_path, fitting_state_file_path)
+                          loss_state_file_path, ds_ts_state_file_path, department_file_path, fitting_state_file_path,
+                          production_report, order_receipt_report)
         manager.manage()
 
 

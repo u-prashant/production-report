@@ -13,7 +13,7 @@ from reporter import ReportManager, DSTSReporter, FittingReporter
 
 class Manager:
     def __init__(self, production_files, loss_files, production_columns_file, summary_file_dir, loss_state_file,
-                 ds_ts_state_file, department_file, fitting_state_file):
+                 ds_ts_state_file, department_file, fitting_state_file, production_report, order_receipt_report):
         self.production_files = production_files
         self.loss_files = loss_files
         self.production_columns_file = production_columns_file
@@ -22,6 +22,8 @@ class Manager:
         self.ds_state_file = ds_ts_state_file
         self.department_file = department_file
         self.fitting_state_file = fitting_state_file
+        self.production_report = production_report
+        self.order_receipt_report = order_receipt_report
 
     @staticmethod
     def get_summary_file(summary_file_dir):
@@ -43,13 +45,15 @@ class Manager:
 
         writer = pd.ExcelWriter(self.summary_file, engine='xlsxwriter')
 
-        ds_ts_reporter = DSTSReporter(writer, production_df, loss_df, loss_states_df, self.ds_state_file)
-        fitting_reporter = FittingReporter(writer, production_df, loss_df, loss_states_df, self.fitting_state_file)
-        reporters = ReportManager([ds_ts_reporter, fitting_reporter])
-        reporters.generate_report()
+        if self.production_report:
+            ds_ts_reporter = DSTSReporter(writer, production_df, loss_df, loss_states_df, self.ds_state_file)
+            fitting_reporter = FittingReporter(writer, production_df, loss_df, loss_states_df, self.fitting_state_file)
+            reporters = ReportManager([ds_ts_reporter, fitting_reporter])
+            reporters.generate_report()
 
-        one_time_prod_reporter = OneTimeProductionReporter(writer)
-        one_time_prod_reporter.generate_report(production_df)
+        if self.order_receipt_report:
+            one_time_prod_reporter = OneTimeProductionReporter(writer)
+            one_time_prod_reporter.generate_report(production_df)
 
         writer.save()
 

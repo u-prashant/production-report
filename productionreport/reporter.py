@@ -40,8 +40,8 @@ class DSTSReporter(Reporter):
 
     def generate_report(self):
         df = self.filter_production_rows()
-        self.generate_zero_production_oci(df)
-        self.generate_zero_production_without_invoice_oci(df)
+        # self.generate_zero_production_oci(df)
+        # self.generate_zero_production_without_invoice_oci(df)
 
     def filter_production_rows(self):
         rows = []
@@ -83,7 +83,7 @@ class FittingReporter(Reporter):
 
     def generate_report(self):
         df = self.filter_production_rows()
-        self.generate_zero_production_oci(df)
+        # self.generate_zero_production_oci(df)
 
     def filter_production_rows(self):
         rows = []

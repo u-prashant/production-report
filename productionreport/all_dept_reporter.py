@@ -33,9 +33,115 @@ class OneTimeProductionReporter:
         return False, lab
 
     def generate_report(self, production_df):
-        production_df = production_df.apply(
-            lambda x: self.get_one_time_production(x))
-        production_df = production_df.reset_index()
-        production_df = production_df[self.columns]
+        one_time_reporter_df = production_df.apply(lambda x: self.get_one_time_production(x))
+        one_time_reporter_df = one_time_reporter_df.reset_index()
+        one_time_reporter_df = one_time_reporter_df[self.columns]
+
+        c = CustomDepartmentReporter()
+        production_df = one_time_reporter_df.apply(lambda x: c.get_custom_report(x), axis=1)
+        # # custom_reporter_df = custom_reporter_df[c.columns[1:]]
+        # custom_reporter_df = custom_reporter_df.reset_index()
+
         print('writing single time production count to file...')
         production_df.to_excel(self.writer, sheet_name=self.sheet_name, index=False)
+
+
+class CustomDepartmentReporter:
+    def __init__(self):
+        self.columns = ['OCINumber',
+                        'UC A2', 'UC A14', 'UC A15',
+                        'UC_TINT A2', 'UC_TINT A14', 'UC_TINT A15',
+                        'UC_FITT A2', 'UC_FITT A14', 'UC_FITT A15',
+                        'Stock_FITT A2', 'Stock_FITT A14', 'Stock_FITT A15',
+                        'Stock_TC A2', 'Stock_TC A14', 'Stock_TC A15',
+                        'Stock_TMC A2', 'Stock_TMC A14', 'Stock_TMC A15',
+                        'Stock_TINT A2', 'Stock_TINT A14', 'Stock_TINT A15',
+                        'TINT_TC A2', 'TINT_TC A14', 'TINT_TC A15',
+                        'TINT_TMC A2', 'TINT_TMC A14', 'TINT_TMC A15',
+                        'TINT_FITT A2', 'TINT_FITT A14', 'TINT_FITT A15']
+
+    @staticmethod
+    def get_custom_report(row):
+        departments = ['TS', 'DS', 'TC', 'TMC', 'TINT', 'FITT']
+        labs = ['A2', 'A14', 'A15']
+        for dept in departments:
+            total = 0
+            for lab in labs:
+                total += row[dept + ' ' + lab]
+            row[dept] = total
+
+        # uncoat order
+        for lab in labs:
+            row['UC' + ' ' + lab] = 0
+            if (row['TS' + ' ' + lab] > 0 or row['DS' + ' ' + lab] > 0) and (row['TC'] == 0) and (row['TMC'] == 0) and (
+                    row['TINT'] == 0):
+                row['UC' + ' ' + lab] = row['TS' + ' ' + lab] + row['DS' + ' ' + lab]
+        row['UC'] = row['UC A2'] + row['UC A14'] + row['UC A15']
+
+        # uncoat tint order
+        for lab in labs:
+            row['UC_TINT' + ' ' + lab] = 0
+            if (row['TS'] > 0 or row['DS'] > 0) and (row['TC'] == 0) and (row['TMC'] == 0) and (
+                    row['TINT' + ' ' + lab] > 0):
+                row['UC_TINT' + ' ' + lab] = row['TINT' + ' ' + lab]
+        row['UC_TINT'] = row['UC_TINT A2'] + row['UC_TINT A14'] + row['UC_TINT A15']
+
+        # uncoat fitting order
+        for lab in labs:
+            row['UC_FITT' + ' ' + lab] = 0
+            if (row['TS'] > 0 or row['DS'] > 0) and (row['TC'] == 0) and (row['TMC'] == 0) and (
+                    row['FITT' + ' ' + lab] > 0):
+                row['UC_FITT' + ' ' + lab] = row['FITT' + ' ' + lab]
+        row['UC_FITT'] = row['UC_FITT A2'] + row['UC_FITT A14'] + row['UC_FITT A15']
+
+        # stock fitting order
+        for lab in labs:
+            row['Stock_FITT' + ' ' + lab] = 0
+            if (row['TS'] == 0) and (row['DS'] == 0) and (row['FITT' + ' ' + lab] > 0):
+                row['Stock_FITT' + ' ' + lab] = row['FITT' + ' ' + lab]
+        row['Stock_FITT'] = row['Stock_FITT A2'] + row['Stock_FITT A14'] + row['Stock_FITT A15']
+
+        # stock tc order
+        for lab in labs:
+            row['Stock_TC' + ' ' + lab] = 0
+            if (row['TS'] == 0) and (row['DS'] == 0) and (row['TC' + ' ' + lab] > 0):
+                row['Stock_TC' + ' ' + lab] = row['TC' + ' ' + lab]
+        row['Stock_TC'] = row['Stock_TC A2'] + row['Stock_TC A14'] + row['Stock_TC A15']
+
+        # stock tmc order
+        for lab in labs:
+            row['Stock_TMC' + ' ' + lab] = 0
+            if (row['TS'] == 0) and (row['DS'] == 0) and (row['TMC' + ' ' + lab] > 0):
+                row['Stock_TMC' + ' ' + lab] = row['TMC' + ' ' + lab]
+        row['Stock_TMC'] = row['Stock_TMC A2'] + row['Stock_TMC A14'] + row['Stock_TMC A15']
+
+        # stock tint order
+        for lab in labs:
+            row['Stock_TINT' + ' ' + lab] = 0
+            if (row['TS'] == 0) and (row['DS'] == 0) and (row['TC'] == 0) and (row['TMC'] == 0) and (
+                    row['TINT' + ' ' + lab] > 0):
+                row['Stock_TINT' + ' ' + lab] = row['TINT' + ' ' + lab]
+        row['Stock_TINT'] = row['Stock_TINT A2'] + row['Stock_TINT A14'] + row['Stock_TINT A15']
+
+        # tint tc order
+        for lab in labs:
+            row['TINT_TC' + ' ' + lab] = 0
+            if (row['TINT'] > 0) and (row['TC' + ' ' + lab] > 0):
+                row['TINT_TC' + ' ' + lab] = row['TC' + ' ' + lab]
+        row['TINT_TC'] = row['TINT_TC A2'] + row['TINT_TC A14'] + row['TINT_TC A15']
+
+        # tint tmc order
+        for lab in labs:
+            row['TINT_TMC' + ' ' + lab] = 0
+            if (row['TINT'] > 0) and (row['TMC' + ' ' + lab] > 0):
+                row['TINT_TMC' + ' ' + lab] = row['TMC' + ' ' + lab]
+        row['TINT_TMC'] = row['TINT_TMC A2'] + row['TINT_TMC A14'] + row['TINT_TMC A15']
+
+        # tint fitting order
+        for lab in labs:
+            row['TINT_FITT' + ' ' + lab] = 0
+            if (row['TINT'] > 0) and (row['FITT' + ' ' + lab] > 0):
+                row['TINT_FITT' + ' ' + lab] = row['FITT' + ' ' + lab]
+        row['TINT_FITT'] = row['TINT_FITT A2'] + row['TINT_FITT A14'] + row['TINT_FITT A15']
+
+        return row
