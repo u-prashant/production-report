@@ -34,9 +34,17 @@ class Manager:
         start = timeit.default_timer()
 
         production_df = ProductionFileReader(self.production_columns_file).read(self.production_files)
-        loss_df = LossFileReader.read(self.loss_files)
-        loss_df = LossPreprocessor().preprocess(loss_df)
-        loss_states_df = LossStateReader.read(self.loss_state_file)
+
+        loss_file_not_selected = (len(self.loss_files) == 0 or self.loss_files[0] == 'No Files Selected')
+
+        if self.production_report and loss_file_not_selected:
+            print('LOSS file is mandatory for production report !!!!!!!!!!!!!!!')
+            return
+
+        if not loss_file_not_selected:
+            loss_df = LossFileReader.read(self.loss_files)
+            loss_df = LossPreprocessor().preprocess(loss_df)
+            loss_states_df = LossStateReader.read(self.loss_state_file)
 
         departments_df = DepartmentFileReader.read(self.department_file)
         department_finder = DepartmentFinder(departments_df)

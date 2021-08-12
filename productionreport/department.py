@@ -7,6 +7,9 @@ class DepartmentFinder:
         return dict(zip(df['OrderStatus'], df['Department']))
 
     def get_department(self, value):
+        if '-KOL' in value:
+            return ''
+
         if value in self.departments_map:
             return self.departments_map[value]
 

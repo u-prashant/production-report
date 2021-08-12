@@ -4,7 +4,7 @@ class OneTimeProductionReporter:
         self.sheet_name = 'single_production_count'
         self.columns = ['OCINumber', 'CustomerName', 'OCIQty', 'OrderDate', 'TS A2', 'TS A14', 'TS A15', 'DS A2',
                         'DS A14', 'DS A15', 'FITT A2', 'FITT A14', 'FITT A15', 'TC A2', 'TC A14', 'TC A15', 'TMC A2',
-                        'TMC A14', 'TMC A15', 'TINT A2', 'TINT A14', 'TINT A15']
+                        'TMC A14', 'TMC A15', 'TINT A2', 'TINT A14', 'TINT A15', 'INVOICED', 'DISPATCH', 'CANCELLED']
 
     def get_one_time_production(self, df):
         departments = self.columns[4:]
@@ -17,6 +17,11 @@ class OneTimeProductionReporter:
             has_production, lab = OneTimeProductionReporter.get_dept_prod(df, dept)
             if has_production:
                 ndf[dept + ' ' + lab].iloc[0] = order_quantity
+
+        for dept in self.columns[22:]:
+            if dept in df['Department'].values:
+                ndf[dept].iloc[0] = order_quantity
+
         return ndf
 
     @staticmethod
@@ -58,7 +63,8 @@ class CustomDepartmentReporter:
                         'Stock_TINT A2', 'Stock_TINT A14', 'Stock_TINT A15',
                         'TINT_TC A2', 'TINT_TC A14', 'TINT_TC A15',
                         'TINT_TMC A2', 'TINT_TMC A14', 'TINT_TMC A15',
-                        'TINT_FITT A2', 'TINT_FITT A14', 'TINT_FITT A15']
+                        'TINT_FITT A2', 'TINT_FITT A14', 'TINT_FITT A15',
+                        'SUR_A14_A15 To TC_A2', 'SUR_A2_A15 To TC_A14', 'SUR_A2_A14 To TC_A15']
 
     @staticmethod
     def get_custom_report(row):
@@ -143,5 +149,23 @@ class CustomDepartmentReporter:
             if (row['TINT'] > 0) and (row['FITT' + ' ' + lab] > 0):
                 row['TINT_FITT' + ' ' + lab] = row['FITT' + ' ' + lab]
         row['TINT_FITT'] = row['TINT_FITT A2'] + row['TINT_FITT A14'] + row['TINT_FITT A15']
+
+        # 'SUR_A14_A15 To TC_A2'
+        row['SUR_A14_A15 To TC_A2'] = 0
+        if (row['TC A2'] > 0) and (row['TS A2'] + row['DS A2'] == 0) and (
+                (row['TS A14'] + row['DS A14'] + row['TS A15'] + row['DS A15'] > 0)):
+            row['SUR_A14_A15 To TC_A2'] = row['TC A2']
+
+        # 'SUR_A2_A15 To TC_A14'
+        row['SUR_A2_A15 To TC_A14'] = 0
+        if (row['TC A14'] > 0) and (row['TS A14'] + row['DS A14'] == 0) and (
+                (row['TS A2'] + row['DS A2'] + row['TS A15'] + row['DS A15'] > 0)):
+            row['SUR_A14_A15 To TC_A14'] = row['TC A14']
+
+        # 'SUR_A2_A14 To TC_A15'
+        row['SUR_A2_A14 To TC_A15'] = 0
+        if (row['TC A15'] > 0) and (row['TS A15'] + row['DS A15'] == 0) and (
+                (row['TS A14'] + row['DS A14'] + row['TS A2'] + row['DS A2'] > 0)):
+            row['SUR_A2_A14 To TC_A15'] = row['TC A15']
 
         return row
