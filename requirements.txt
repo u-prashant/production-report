@@ -3,3 +3,4 @@ openpyxl
 xlsxwriter
 pyinstaller
 future~=0.18.2
+numpy~=1.21.0

@@ -1,1 +1,1 @@
-OCINumber,CustomerName,OCIQty,OrderStatus,OrderDate,DateOfChange,ChangeOfTime
+OCINumber,CustomerName,CustomerCode,BUCode,OCIQty,OrderStatus,OrderDate,DateOfChange,ChangeOfTime

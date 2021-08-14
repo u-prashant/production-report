@@ -23,7 +23,10 @@ class ProductionFileReader:
         dfs = []
         for file in production_files:
             print('Reading {} file...'.format(file))
-            dfs.append(Reader.read_csv(file)[self.columns])
+            df = Reader.read_csv(file)
+            if 'BUCode' not in df.columns:
+                df['BUCode'] = ''
+            dfs.append(df[self.columns])
         return pd.concat(dfs)
 
 
