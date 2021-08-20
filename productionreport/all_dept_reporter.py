@@ -30,7 +30,7 @@ class OneTimeProductionReporter:
             'Stock_FITT A14', 'Stock_FITT A15', 'Stock_FITT', 'FINAL_QC_A2 To Auto_Pack', 'FINAL_QC_A2 To FITT',
             'FINAL_QC_A14 To Auto_Pack', 'FINAL_QC_A14 To FITT', 'FINAL_QC_A15 To Auto_Pack', 'FINAL_QC_A15 To FITT',
             'PACKING_A14 To Auto_Pack', 'PACKING_A14 To FITT', 'PACKING_A15 To Auto_Pack', 'PACKING_A15 To FITT',
-            'SUR_A14_A15 To TC_A14', 'SUR_A14_A15 To TC_A2', 'SUR_A2_A14 To TC_A15', 'SUR_A2_A15 To TC_A14',
+            'SUR_A14_A15 To TC_A2', 'SUR_A2_A14 To TC_A15', 'SUR_A2_A15 To TC_A14',
             'FRAME REVEIVED', 'DISPATCH', 'DELIVERED', 'INVOICED'
         ]
 
@@ -224,25 +224,25 @@ class CustomDepartmentReporter:
         # FINAL_QC To Fitting - FINAL_QC_A2 To FITT
         for lab in labs:
             row['FINAL_QC_' + lab + ' To FITT'] = 0
-            if row['FINAL QC ' + lab] > 0 and row['FITT ' + lab] > 0:
+            if row['FINAL QC ' + lab] > 0 and row['FITT'] > 0:
                 row['FINAL_QC_' + lab + ' To FITT'] = row['FINAL QC ' + lab]
 
         # Packing To Fitting -
         for lab in labs:
             row['PACKING_' + lab + ' To FITT'] = 0
-            if row['PACKING ' + lab] > 0 and row['FITT ' + lab] > 0:
+            if row['PACKING ' + lab] > 0 and row['FITT'] > 0:
                 row['PACKING_' + lab + ' To FITT'] = row['PACKING ' + lab]
 
         # FINAL_QC To AutoPack
         for lab in labs:
             row['FINAL_QC_' + lab + ' To Auto_Pack'] = 0
-            if row['FINAL QC ' + lab] > 0 and row['AUTO PACKER ' + lab] > 0:
+            if row['FINAL QC ' + lab] > 0 and row['AUTO PACKER A15'] > 0:
                 row['FINAL_QC_' + lab + ' To Auto_Pack'] = row['FINAL QC ' + lab]
 
         # Packing To AutoPack
         for lab in labs:
             row['PACKING_' + lab + ' To Auto_Pack'] = 0
-            if row['PACKING ' + lab] > 0 and row['AUTO PACKER ' + lab] > 0:
+            if row['PACKING ' + lab] > 0 and row['AUTO PACKER A15'] > 0:
                 row['PACKING_' + lab + ' To Auto_Pack'] = row['PACKING ' + lab]
 
         return row
