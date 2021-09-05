@@ -166,10 +166,11 @@ class GenerateReportGUI:
         ds_ts_state_file_path = r'data/ds_ts_states.csv'
         department_file_path = r'data/departments.xlsx'
         fitting_state_file_path = r'data/fitting_states.csv'
+        customer_info_file_path = r'data/customer_info.csv'
 
         manager = Manager(prod_files_path, loss_files_path, production_columns_file_path, target_dir,
                           loss_state_file_path, ds_ts_state_file_path, department_file_path, fitting_state_file_path,
-                          production_report, order_receipt_report)
+                          production_report, order_receipt_report, customer_info_file_path)
         manager.manage()
 
 

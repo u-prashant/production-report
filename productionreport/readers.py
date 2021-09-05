@@ -50,3 +50,9 @@ class DepartmentFileReader:
     @staticmethod
     def read(department_file):
         return Reader.read_excel(department_file)
+
+
+class CustomerInfoReader:
+    @staticmethod
+    def read(customer_file):
+        return Reader.read_csv(customer_file)

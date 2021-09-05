@@ -7,9 +7,9 @@ class OneTimeProductionReporter:
         self.sheet_name = 'single_production_count'
         self.depts = ['TS', 'DS', 'FITT', 'TC', 'TMC', 'TINT', 'FINAL QC']
         self.sub_depts = ['STRIPPING', 'DECOAT', 'ULTRA', 'PACKING', 'AUTO PACKER']
-        self.info_columns = ['OCINumber', 'CustomerName', 'CustomerCode', 'BUCode', 'OCIQty', 'OrderDate']
+        self.info_columns = ['OCINumber', 'CustomerName', 'CustomerCode', 'BUCode', 'OCIQty', 'OrderDate', 'Building']
         self.building_columns = self.get_building_columns()
-        self.non_building_columns = ['INVOICED', 'DISPATCH', 'CANCELLED']
+        self.non_building_columns = ['INVOICED', 'DISPATCH', 'CANCELLED', 'HOLD', 'CONFIRMATION']
         self.non_building_sub_depts = ['FRAME REVEIVED', 'DELIVERED']
         self.columns = self.info_columns + self.building_columns + self.non_building_columns + self.non_building_sub_depts
         self.departments = self.building_columns + self.non_building_columns + self.non_building_sub_depts
@@ -31,7 +31,7 @@ class OneTimeProductionReporter:
             'FINAL_QC_A14 To Auto_Pack', 'FINAL_QC_A14 To FITT', 'FINAL_QC_A15 To Auto_Pack', 'FINAL_QC_A15 To FITT',
             'PACKING_A14 To Auto_Pack', 'PACKING_A14 To FITT', 'PACKING_A15 To Auto_Pack', 'PACKING_A15 To FITT',
             'SUR_A14_A15 To TC_A2', 'SUR_A2_A14 To TC_A15', 'SUR_A2_A15 To TC_A14',
-            'FRAME REVEIVED', 'DISPATCH', 'DELIVERED', 'INVOICED'
+            'FRAME REVEIVED', 'DISPATCH', 'DELIVERED', 'INVOICED', 'HOLD', 'CONFIRMATION', 'Building'
         ]
 
     def get_building_columns(self):

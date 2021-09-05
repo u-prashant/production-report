@@ -7,13 +7,14 @@ import pandas as pd
 from department import DepartmentFinder
 from all_dept_reporter import OneTimeProductionReporter
 from preprocess import Preprocess, LossPreprocessor
-from readers import ProductionFileReader, LossFileReader, LossStateReader, DepartmentFileReader
+from readers import ProductionFileReader, LossFileReader, LossStateReader, DepartmentFileReader, CustomerInfoReader
 from reporter import ReportManager, DSTSReporter, FittingReporter
 
 
 class Manager:
     def __init__(self, production_files, loss_files, production_columns_file, summary_file_dir, loss_state_file,
-                 ds_ts_state_file, department_file, fitting_state_file, production_report, order_receipt_report):
+                 ds_ts_state_file, department_file, fitting_state_file, production_report, order_receipt_report,
+                 customer_info_file):
         self.production_files = production_files
         self.loss_files = loss_files
         self.production_columns_file = production_columns_file
@@ -24,6 +25,7 @@ class Manager:
         self.fitting_state_file = fitting_state_file
         self.production_report = production_report
         self.order_receipt_report = order_receipt_report
+        self.customer_info_file = customer_info_file
 
     @staticmethod
     def get_summary_file(summary_file_dir):
@@ -34,6 +36,10 @@ class Manager:
         start = timeit.default_timer()
 
         production_df = ProductionFileReader(self.production_columns_file).read(self.production_files)
+
+        customer_df = CustomerInfoReader.read(self.customer_info_file)
+
+        production_df = pd.merge(production_df, customer_df, how='left', on='CustomerCode')
 
         loss_file_not_selected = (len(self.loss_files) == 0 or self.loss_files[0] == 'No Files Selected')
 
