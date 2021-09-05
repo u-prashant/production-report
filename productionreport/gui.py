@@ -27,31 +27,31 @@ class GUI:
         generate = GenerateReportGUI(window, prod, loss, target, self.config, prod_checkbox, order_receipt_checkbox)
         exit_btn = ExitGUI(window)
 
-        prod.label_static.grid(column=1, row=1, padx=15, pady=20, sticky='W')
-        prod.button_browse.grid(column=4, row=1, padx=15, pady=20, sticky='EW')
-        prod.label_dynamic.grid(column=1, row=2, columnspan=4, padx=15, pady=20, sticky='EW')
+        prod.label_static.grid(column=1, row=1, padx=15, pady=13, sticky='W')
+        prod.button_browse.grid(column=4, row=1, padx=15, pady=13, sticky='EW')
+        prod.label_dynamic.grid(column=1, row=2, columnspan=4, padx=15, pady=13, sticky='EW')
 
         ttk.Separator(window, orient='horizontal').grid(column=1, row=3, columnspan=4, sticky='ew')
 
-        loss.label_static.grid(column=1, row=4, padx=15, pady=20, sticky='W')
-        loss.button_browse.grid(column=4, row=4, padx=15, pady=20, sticky='EW')
-        loss.label_dynamic.grid(column=1, row=5, columnspan=4, padx=15, pady=20, sticky='EW')
+        loss.label_static.grid(column=1, row=4, padx=15, pady=13, sticky='W')
+        loss.button_browse.grid(column=4, row=4, padx=15, pady=13, sticky='EW')
+        loss.label_dynamic.grid(column=1, row=5, columnspan=4, padx=15, pady=13, sticky='EW')
 
         ttk.Separator(window, orient='horizontal').grid(column=1, row=6, columnspan=4, sticky='ew')
 
-        target.label_static.grid(column=1, row=7, padx=15, pady=20, sticky='W')
-        target.button_browse.grid(column=4, row=7, padx=15, pady=20, sticky='EW')
-        target.label_dynamic.grid(column=1, row=8, columnspan=4, padx=15, pady=20, sticky='EW')
+        target.label_static.grid(column=1, row=7, padx=15, pady=13, sticky='W')
+        target.button_browse.grid(column=4, row=7, padx=15, pady=13, sticky='EW')
+        target.label_dynamic.grid(column=1, row=8, columnspan=4, padx=15, pady=13, sticky='EW')
 
         ttk.Separator(window, orient='horizontal').grid(column=1, row=9, columnspan=4, sticky='ew')
 
-        prod_checkbox.checkbox.grid(column=2, row=10, columnspan=2, padx=15, pady=20, sticky='EW')
-        order_receipt_checkbox.checkbox.grid(column=2, row=11, columnspan=2, padx=15, pady=20, sticky='EW')
+        prod_checkbox.checkbox.grid(column=2, row=10, columnspan=2, padx=15, pady=13, sticky='EW')
+        order_receipt_checkbox.checkbox.grid(column=2, row=11, columnspan=2, padx=15, pady=13, sticky='EW')
 
         ttk.Separator(window, orient='horizontal').grid(column=1, row=12, columnspan=4, sticky='ew')
 
-        generate.button.grid(column=2, row=13, columnspan=2, padx=15, pady=20, sticky='EW')
-        exit_btn.button.grid(column=2, row=14, columnspan=2, padx=15, pady=20, sticky='EW')
+        generate.button.grid(column=2, row=13, columnspan=2, padx=15, pady=13, sticky='EW')
+        exit_btn.button.grid(column=2, row=14, columnspan=2, padx=15, pady=13, sticky='EW')
 
         window.mainloop()
 
