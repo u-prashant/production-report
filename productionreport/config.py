@@ -8,6 +8,7 @@ class Config:
         self.production_dir = '/'
         self.loss_dir = '/'
         self.target_dir = '/'
+        self.tst = "test"
 
     def read(self):
         try:
